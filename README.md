@@ -15,6 +15,13 @@ cd gps-tool
 npm install
 ```
 
+Copia la plantilla de variables de entorno y ajusta los valores para tu máquina:
+
+```bash
+cp .env.example .env
+# Edita .env con tu URL, token y proxy (ver sección más abajo)
+```
+
 ## Levantar en desarrollo
 
 ```bash
@@ -46,16 +53,55 @@ La URL y el token **no están hardcodeados**: se configuran desde la propia inte
 
 ### Opción B — valores por defecto vía `.env`
 
-Si quieres que la app arranque con valores preconfigurados sin tener que usar el modal, crea un archivo `.env` en la raíz del proyecto:
+Si quieres que la app arranque con valores preconfigurados sin tener que usar el modal, edita `.env`:
 
 ```env
-VITE_GPS_API_URL=https://api.ejemplo.com/gps/position
+VITE_GPS_API_URL=http://gps-api.test/api/gps-tracker
 VITE_GPS_API_TOKEN=tu_bearer_token_aqui
 ```
 
-Estos valores actúan como **fallback**: si el usuario ya guardó una configuración desde la UI, la configuración del `.env` es ignorada.
+Estos valores actúan como **fallback**: si el usuario ya guardó una configuración desde la UI mediante el modal ⚙, el `.env` es ignorado.
 
-> `.env` **nunca** se sube al repositorio (está en `.gitignore`). Úsalo solo para desarrollo local.
+> `.env` **nunca** se sube al repositorio (está en `.gitignore`). Copia `.env.example` como punto de partida.
+
+---
+
+## Solución de problemas CORS (desarrollo local)
+
+Los navegadores bloquean peticiones cross-origin, por lo que `http://gps-api.test` falla en el navegador aunque funcione en curl o Insomnia. La app incluye un **proxy de Vite** que resuelve esto sin tocar la API.
+
+### Configuración (una vez por desarrollador)
+
+Agrega esta variable a tu `.env`:
+
+```env
+VITE_GPS_DEV_PROXY=http://gps-api.test
+```
+
+Reinicia el servidor de desarrollo (`npm run dev`). A partir de ese momento las peticiones a `http://gps-api.test` se redirigen automáticamente a través del servidor de Vite, evitando el CORS. **No necesitas cambiar la URL en el modal ⚙**.
+
+### Cómo funciona
+
+```
+Navegador → localhost:5173/gps-proxy/api/gps-tracker
+                    ↓  (Vite proxy, servidor a servidor)
+             http://gps-api.test/api/gps-tracker
+```
+
+El proxy solo aplica en modo desarrollo. En producción, las peticiones van directo a la URL configurada.
+
+### Alternativa: configurar CORS en la API Laravel
+
+Si prefieres no usar el proxy (por ejemplo, la API está en un servidor remoto), puedes configurar CORS en el proyecto Laravel del microservicio GPS:
+
+```php
+// config/cors.php
+'allowed_origins' => ['http://localhost:5173'],
+```
+
+```bash
+php artisan config:clear
+```
 
 ---
 
