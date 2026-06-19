@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.leaflet-container {
+  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.marker-label {
+  background: #0ea5e9;
+  color: #0b1020;
+  border: 2px solid #0b1020;
+  border-radius: 9999px;
+  font-weight: 700;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.4);
+}
+
+.marker-label--selected {
+  background: #f59e0b;
+  border-color: #0b1020;
+}
+
+.panel-card {
+  @apply bg-slate-900/80 border border-slate-800 rounded-2xl shadow-xl;
+}
+
+.positions-table tbody tr.is-selected {
+  background-color: rgba(15, 23, 42, 0.75);
+}
+
+.positions-table tbody tr.is-selected td:first-child {
+  border-left: 3px solid #38bdf8;
+}
